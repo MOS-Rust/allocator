@@ -1,5 +1,4 @@
 //! An intrusive singly linked list (stack) implementation without alloc crate.
-//! Found here: https://cs140e.sergio.bz/assignments/2-fs/
 use core::marker::PhantomData;
 use core::{fmt, ptr};
 
@@ -123,7 +122,6 @@ impl<'a> Iterator for IterMut<'a> {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -143,13 +141,32 @@ mod tests {
                 list.push(&mut ptrs[i] as *mut usize);
             }
         }
-
         assert!(!list.is_empty());
+        for i in 0..10 {
+            assert_eq!(list.pop().unwrap(), &mut ptrs[9 - i] as *mut usize);
+        }
+    }
+
+    #[test]
+    fn test_iter() {
+        let mut list = List::new();
+        let mut ptrs = [0usize; 10];
+        unsafe {
+            for i in 0..10 {
+                list.push(&mut ptrs[i] as *mut usize);
+            }
+        }
         let mut iter = list.iter();
         for i in 0..=8 {
-            assert_eq!(unsafe{ *(*iter.next().unwrap() as *mut usize) }, ptrs[8-i] );
+            assert_eq!(
+                unsafe { *(*iter.next().unwrap() as *mut usize) },
+                ptrs[8 - i]
+            );
         }
-        assert_eq!(unsafe{ *iter.next().unwrap() as *mut usize }, ptr::null_mut());
-        assert_eq!(iter.next(), None); 
+        assert_eq!(
+            unsafe { *iter.next().unwrap() as *mut usize },
+            ptr::null_mut()
+        );
+        assert_eq!(iter.next(), None);
     }
 }
