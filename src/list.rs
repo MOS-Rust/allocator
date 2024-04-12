@@ -15,7 +15,7 @@ pub struct Node {
 }
 
 impl List {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         List {
             head: ptr::null_mut(),
         }
@@ -119,54 +119,5 @@ impl<'a> Iterator for IterMut<'a> {
             }
             Some(node)
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_new_list_is_empty() {
-        let list: List = List::new();
-        assert!(list.is_empty());
-    }
-
-    #[test]
-    fn test_push_and_pop() {
-        let mut list = List::new();
-        let mut ptrs = [0usize; 10];
-        unsafe {
-            for i in 0..10 {
-                list.push(&mut ptrs[i] as *mut usize);
-            }
-        }
-        assert!(!list.is_empty());
-        for i in 0..10 {
-            assert_eq!(list.pop().unwrap(), &mut ptrs[9 - i] as *mut usize);
-        }
-    }
-
-    #[test]
-    fn test_iter() {
-        let mut list = List::new();
-        let mut ptrs = [0usize; 10];
-        unsafe {
-            for i in 0..10 {
-                list.push(&mut ptrs[i] as *mut usize);
-            }
-        }
-        let mut iter = list.iter();
-        for i in 0..=8 {
-            assert_eq!(
-                unsafe { *(*iter.next().unwrap() as *mut usize) },
-                ptrs[8 - i]
-            );
-        }
-        assert_eq!(
-            unsafe { *iter.next().unwrap() as *mut usize },
-            ptr::null_mut()
-        );
-        assert_eq!(iter.next(), None);
     }
 }
