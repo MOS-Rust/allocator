@@ -27,7 +27,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT }}
       - name: Commit changes
         run: |
-          git add alloc
+          git add allocator
           git commit -m "Github: Update submodule to latest commit"
           git push origin main
         env:
