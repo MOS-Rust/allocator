@@ -23,10 +23,6 @@ impl<const ORDER: usize> Heap<ORDER> {
         }
     }
 
-    pub const fn empty() -> Self {
-        Self::new()
-    }
-
     pub unsafe fn add_range(&mut self, mut start: usize, mut end: usize) {
         // align start and end
         start = (start + size_of::<usize>() - 1) & (!size_of::<usize>() + 1);

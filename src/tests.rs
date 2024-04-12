@@ -56,7 +56,7 @@ mod alloc_tests {
 
     #[test]
     fn test_empty_heap() {
-        let mut heap = Heap::<10>::empty();
+        let mut heap = Heap::<10>::new();
         assert_eq!(heap.total(), 0);
         assert_eq!(heap.allocated(), 0);
         assert!(heap.alloc(Layout::from_size_align(1, 1).unwrap()).is_err());
