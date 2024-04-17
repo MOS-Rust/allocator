@@ -50,7 +50,7 @@ mod list_tests {
 
 
 #[cfg(test)]
-mod alloc_tests {
+mod buddy_tests {
     use core::{alloc::Layout, mem::size_of};
     use crate::buddy::Heap;
 
@@ -112,3 +112,30 @@ mod alloc_tests {
         assert!(heap.alloc(Layout::from_size_align(4096, 1).unwrap()).is_err());
     }
 }
+ #[cfg(test)]
+ mod alloc_tests {
+     use core::alloc::GlobalAlloc;
+     use crate::Allocator;
+ 
+     static ALLOCATOR: Allocator<32> = Allocator::new();
+ 
+     #[test]
+     fn test_alloc_dealloc() {
+        let space: [u8; 1500] = [0; 1500];
+        unsafe {
+            ALLOCATOR.0.lock().add_size(space.as_ptr() as usize, 2048);
+        }
+        let mem1 = unsafe {ALLOCATOR.alloc(core::alloc::Layout::from_size_align(512, 1).unwrap())};
+        assert!(!mem1.is_null());
+        let mem2 = unsafe {ALLOCATOR.alloc(core::alloc::Layout::from_size_align(512, 1).unwrap())};
+        assert!(!mem2.is_null());
+        let mem3 = unsafe {ALLOCATOR.alloc(core::alloc::Layout::from_size_align(1024, 1).unwrap())};
+        assert!(mem3.is_null());
+        unsafe {
+            ALLOCATOR.dealloc(mem1, core::alloc::Layout::from_size_align(512, 1).unwrap());
+            ALLOCATOR.dealloc(mem2, core::alloc::Layout::from_size_align(512, 1).unwrap());
+        }
+        let mem4 = unsafe {ALLOCATOR.alloc(core::alloc::Layout::from_size_align(1024, 1).unwrap())};
+        assert!(!mem4.is_null());
+     }
+ }

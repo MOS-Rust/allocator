@@ -1,6 +1,6 @@
 #![no_std]
-
 extern crate alloc;
+extern crate spin;
 
 use core::ops::Deref;
 use alloc::alloc::{GlobalAlloc, Layout};
@@ -30,14 +30,16 @@ impl<const ORDER: usize> Deref for Allocator<ORDER> {
 
 unsafe impl<const ORDER: usize> GlobalAlloc for Allocator<ORDER> {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        self.lock()
+        self.0
+            .lock()
             .alloc(layout)
             .ok()
             .map_or(core::ptr::null_mut(), |ptr| ptr.as_ptr())
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        self.lock()
+        self.0
+            .lock()
             .dealloc(core::ptr::NonNull::new_unchecked(ptr), layout)
     }
 }
