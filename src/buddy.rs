@@ -5,7 +5,6 @@ use core::ptr::NonNull;
 
 use crate::list;
 
-
 pub struct Heap<const ORDER: usize> {
     free_area: [list::List; ORDER],
 
@@ -17,7 +16,6 @@ impl<const ORDER: usize> Heap<ORDER> {
     pub const fn new() -> Self {
         Heap {
             free_area: [list::List::new(); ORDER],
-
             total: 0,
             allocated: 0,
         }
@@ -31,7 +29,7 @@ impl<const ORDER: usize> Heap<ORDER> {
         let mut total = 0;
         while start + size_of::<usize>() <= end {
             // This ensures the memory is aligned.
-            let lowbit = (1 as usize) << start.trailing_zeros();
+            let lowbit = 1 << start.trailing_zeros();
             let size = lowbit.min(prev_power_of_2(end - start));
 
             total += size;
@@ -59,7 +57,7 @@ impl<const ORDER: usize> Heap<ORDER> {
                             // the "left" block is pushed later, so it's popped first
                             self.free_area[j - 1]
                                 .push((block as usize + (1 << (j - 1))) as *mut usize);
-                            self.free_area[j - 1].push(block as *mut usize);
+                            self.free_area[j - 1].push(block);
                         }
                     } else {
                         return Err(());
@@ -126,6 +124,11 @@ impl<const ORDER: usize> Heap<ORDER> {
     }
 }
 
+impl<const ORDER: usize> Default for Heap<ORDER> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 fn prev_power_of_2(n: usize) -> usize {
     1 << (usize::BITS as usize - n.leading_zeros() as usize - 1)
